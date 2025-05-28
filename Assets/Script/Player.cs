@@ -9,6 +9,7 @@ public class Player : MonoBehaviour
 
     private Rigidbody2D rb;
     private bool isGrounded = false;
+    private bool isPaused = false;
 
     void Start()
     {
@@ -36,6 +37,20 @@ public class Player : MonoBehaviour
         {
             rb.AddForce(new Vector2(0f, jumpForce), ForceMode2D.Impulse);
             isGrounded = false;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (isPaused)
+            {
+                Time.timeScale = 1f;
+                isPaused = false;
+            }
+            else
+            {
+                Time.timeScale = 0f;
+                isPaused = true;
+            }
         }
     }
 
