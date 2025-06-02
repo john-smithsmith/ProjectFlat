@@ -23,13 +23,17 @@ public class Player : MonoBehaviour
 
         if (moveDirection > 0)
         {
-            transform.localScale = new Vector3(1f, 1f, 1f);
+            
+            transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
         }
         else if (moveDirection < 0)
         {
-            transform.localScale = new Vector3(-1f, 1f, 1f);
+            
+            transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
         }
-    }
+        
+    
+}
 
     void Update()
     {
