@@ -9,10 +9,16 @@ public class Player : MonoBehaviour
     public float climbSpeed = 3f;
 
     private Rigidbody2D rb;
+    private float originalGravity;
+
+    private float horizontalInput;
+    private float verticalInput;
+    private bool jumpInputDown;
+
     private bool isGrounded = false;
     private bool isPaused = false;
     private bool isClimbing = false;
-    private float originalGravity;
+    
 
     void Start()
     {
@@ -20,51 +26,57 @@ public class Player : MonoBehaviour
         originalGravity = rb.gravityScale;
     }
 
-    void FixedUpdate()
-    {
-        float moveDirection = Input.GetAxis("Horizontal");
-        rb.velocity = new Vector2(moveDirection * moveSpeed, rb.velocity.y);
-
-        if (moveDirection > 0)
-        {
-            
-            transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
-        }
-        else if (moveDirection < 0)
-        {
-            
-            transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
-        }
-        
-    
-}
-
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        horizontalInput = Input.GetAxis("Horizontal");
+        verticalInput = Input.GetAxisRaw("Vertical"); 
+
+        
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            jumpInputDown = true;
+        }
+
+        
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            TogglePause();
+        }
+    }
+
+    void FixedUpdate() 
+    {
+        
+        rb.velocity = new Vector2(horizontalInput * moveSpeed, rb.velocity.y);
+
+        
+        if (horizontalInput > 0)
+        {
+            transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
+        }
+        else if (horizontalInput < 0)
+        {
+            transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
+        }
+
+        
+        if (jumpInputDown && isGrounded && !isClimbing)
         {
             rb.AddForce(new Vector2(0f, jumpForce), ForceMode2D.Impulse);
             isGrounded = false;
         }
+        jumpInputDown = false;
 
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            if (isPaused)
-            {
-                Time.timeScale = 1f;
-                isPaused = false;
-            }
-            else
-            {
-                Time.timeScale = 0f;
-                isPaused = true;
-            }
-        }
-
+       
         if (isClimbing)
         {
-            float vertical = Input.GetAxisRaw("Vertical");
-            rb.velocity = new Vector2(rb.velocity.x, vertical * climbSpeed);
+            
+            rb.gravityScale = 0f;
+            rb.velocity = new Vector2(rb.velocity.x, verticalInput * climbSpeed);
+        }
+        else
+        {
+           
         }
     }
 
@@ -76,6 +88,24 @@ public class Player : MonoBehaviour
         }
     }
 
+    
+    void OnCollisionStay2D(Collision2D other)
+    {
+        if (other.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = true;
+        }
+    }
+
+    void OnCollisionExit2D(Collision2D other)
+    {
+        
+        if (other.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = false;
+        }
+    }
+
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Ladder"))
@@ -83,8 +113,8 @@ public class Player : MonoBehaviour
             Debug.Log("Enter Trigger: " + other.gameObject.name);
             isClimbing = true;
             rb.gravityScale = 0f;
+            
             rb.velocity = new Vector2(rb.velocity.x, 0f);
-
         }
     }
 
@@ -94,7 +124,14 @@ public class Player : MonoBehaviour
         {
             isClimbing = false;
             rb.gravityScale = originalGravity;
-
+            
         }
+    }
+
+    private void TogglePause()
+    {
+        isPaused = !isPaused;
+        Time.timeScale = isPaused ? 0f : 1f;
+        
     }
 }
