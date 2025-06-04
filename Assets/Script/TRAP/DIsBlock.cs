@@ -10,6 +10,15 @@ public class Sensor : MonoBehaviour
     private TilemapRenderer tileRenderer;
     public float detectRadius = 0.5f;  // 플레이어 감지
 
+    void Start()
+    {
+        
+        if (tilemap != null)
+        {
+            tileRenderer = tilemap.GetComponent<TilemapRenderer>();
+        }
+    }
+
     void Update()
     {
         // 플레이어 주변 타일 감지
