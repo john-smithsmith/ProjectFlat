@@ -6,14 +6,18 @@ public class Player : MonoBehaviour
 {
     public float moveSpeed = 5f;
     public float jumpForce = 5f;
+    public float climbSpeed = 3f;
 
     private Rigidbody2D rb;
     private bool isGrounded = false;
     private bool isPaused = false;
+    private bool isClimbing = false;
+    private float originalGravity;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        originalGravity = rb.gravityScale;
     }
 
     void FixedUpdate()
@@ -56,6 +60,12 @@ public class Player : MonoBehaviour
                 isPaused = true;
             }
         }
+
+        if (isClimbing)
+        {
+            float vertical = Input.GetAxisRaw("Vertical");
+            rb.velocity = new Vector2(rb.velocity.x, vertical * climbSpeed);
+        }
     }
 
     void OnCollisionEnter2D(Collision2D other)
@@ -63,6 +73,28 @@ public class Player : MonoBehaviour
         if (other.gameObject.CompareTag("Ground"))
         {
             isGrounded = true;
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Ladder"))
+        {
+            Debug.Log("Enter Trigger: " + other.gameObject.name);
+            isClimbing = true;
+            rb.gravityScale = 0f;
+            rb.velocity = new Vector2(rb.velocity.x, 0f);
+
+        }
+    }
+
+    void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.CompareTag("Ladder"))
+        {
+            isClimbing = false;
+            rb.gravityScale = originalGravity;
+
         }
     }
 }
