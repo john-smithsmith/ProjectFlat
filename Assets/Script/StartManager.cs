@@ -29,6 +29,12 @@ public class StartMenuManager : MonoBehaviour
         optionsPanel.SetActive(false);
     }
 
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
+
+
     public void OnResolutionChanged(int index)
     {
         switch (index)

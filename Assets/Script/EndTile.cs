@@ -7,16 +7,27 @@ public class EndingTrigger : MonoBehaviour
 {
     public GameObject endingPanel; // UI 패널 
 
+    private ENDManage endManager;
+    void Start()
+    {
+        
+        endManager = FindObjectOfType<ENDManage>();
+        if (endManager == null)
+        {
+            
+        }
+    }
+
+
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
             Debug.Log("엔딩");
 
-            if (endingPanel != null)
+            if (endManager != null)
             {
-                endingPanel.SetActive(true);
-                Time.timeScale = 0f; // 일시 정지 (선택)
+                endManager.ShowEndPanel();
             }
             else
             {
