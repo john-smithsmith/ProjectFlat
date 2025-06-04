@@ -10,6 +10,7 @@ public class Player : MonoBehaviour
 
     private Rigidbody2D rb;
     private float originalGravity;
+    private Animator animator;
 
     private float horizontalInput;
     private float verticalInput;
@@ -23,6 +24,7 @@ public class Player : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
         originalGravity = rb.gravityScale;
     }
 
@@ -42,6 +44,12 @@ public class Player : MonoBehaviour
         {
             TogglePause();
         }
+
+        animator.SetBool("ismove", Mathf.Abs(horizontalInput) > 0.01f);
+
+        bool currentlyOnAir = !isGrounded && !isClimbing;
+        animator.SetBool("onair", currentlyOnAir);
+
     }
 
     void FixedUpdate() 
@@ -64,6 +72,7 @@ public class Player : MonoBehaviour
         {
             rb.AddForce(new Vector2(0f, jumpForce), ForceMode2D.Impulse);
             isGrounded = false;
+            animator.SetBool("isjump", true);
         }
         jumpInputDown = false;
 
@@ -84,7 +93,12 @@ public class Player : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Ground"))
         {
-            isGrounded = true;
+            if (!isGrounded) 
+            {
+                isGrounded = true;
+                animator.SetBool("isjump", false); 
+                animator.SetTrigger("land");      
+            }
         }
     }
 
